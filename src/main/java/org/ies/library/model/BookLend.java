@@ -3,12 +3,14 @@ package org.ies.library.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 
 public class BookLend implements Comparable<BookLend>{
     private String isbn;
-    private String date;
+    private LocalDate date;
     private String nif;
 
     @Override
