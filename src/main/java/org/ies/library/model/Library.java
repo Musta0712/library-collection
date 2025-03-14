@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -18,11 +15,21 @@ public class Library {
     private List<Customer> customers;
     private TreeSet<BookLend> bookLends;
 
-    public static List<Book> getBook(List<Book> books, String genre) {
-        List<Book> result = new ArrayList<>();
-        for (var book : books) {
+    public List<Book> listGenreBooks(String genre) {
+        List<Book> genreBooks = new ArrayList<>();
+        for (Book book : booksByIsbn.values()) {
             if (book.getGenres().contains(genre)) {
-                result.add(book);
+                genreBooks.add(book);
+            }
+        }
+        return genreBooks;
+    }
+
+    public List<Customer> listCustomerByZipCode(int zipCode) {
+        List<Customer> result = new ArrayList<>();
+        for (var customer : customers) {
+            if (customer.getZipCode() == zipCode) {
+                result.add(customer);
             }
         }
         return result;
@@ -43,12 +50,50 @@ public class Library {
         }
     }
 
-    public boolean borrowedBook(String isbn, int customerNumber){
+    public boolean hasLentBook(int customerNumber, String isbn) {
 
+        var customer = findCustomer(customerNumber);
+
+        if (customer != null) {
+            for (var bookLend : bookLends) {
+                if (bookLend.getNif().equals(customer.getNif()) &&
+                        bookLend.getIsbn().equals(isbn)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
-    public void getGenre(String isbn){
-
+    public Customer findCustomer(int customerNumber) {
+        for (var customer : customers) {
+            if (customer.getCustomerNumber() == customerNumber) {
+                return customer;
+            }
+        }
+        return null;
     }
 
+    public Set<String> getBookGenres(String isbn) {
+        if (booksByIsbn.containsKey(isbn)) {
+            var book = booksByIsbn.get(isbn);
+            return book.getGenres();
+        }
+        return null;
+    }
+
+    public List<BookLend> findBookLends(String isbn) {
+        if (booksByIsbn.containsKey(isbn)) {
+            List<BookLend> lends = new ArrayList<>();
+            for (var bookLend : bookLends) {
+                if (bookLend.getIsbn().equals(isbn)) {
+                    lends.add(bookLend);
+                }
+            }
+            return lends;
+        } else {
+            return null;
+        }
+    }
 }
